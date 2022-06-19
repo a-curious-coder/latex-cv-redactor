@@ -3,7 +3,6 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
 keywords.txt
 *.pdf
-*.zip
 CV/
 ### Python ###
 # Byte-compiled / optimized / DLL files
