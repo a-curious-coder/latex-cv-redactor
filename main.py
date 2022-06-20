@@ -3,7 +3,7 @@ import sys
 import zipfile
 import os
 import threading
-
+from pdf2image import convert_from_path
 
 def unzip_latex_project(zip_file):
     """ Unzip the latex project
@@ -189,7 +189,8 @@ def menu(args=None):
         print("\n\n")
         print("[1]\tRedact keywords in document")
         print("[2]\tReplace keywords in document")
-        print("[3]\tExit")
+        print("[3]\tPDF to PNG")
+        print("[4]\tExit")
         print("\n\n")
         choice = input("Enter your choice > ")
     else:
@@ -202,7 +203,15 @@ def menu(args=None):
     elif choice == "2":
         print("\n\n[INFO]\tReplacing keywords...")
         redact = False
-    elif choice == "3" or "exit":
+    elif choice == "3":
+        # Get pdf file name from user, make sure it exists
+        pdf_file = input("\n\n[INFO]\tEnter the name of the PDF file > ")
+        if not os.path.isfile(pdf_file):
+            print("\n\n[ERROR]\tFile does not exist")
+            menu(args)
+        print("\n\n[INFO]\tConverting PDF to PNG...")
+        pdf_to_png(pdf_file)
+    elif choice == "4" or "exit":
         print("\n\n[INFO]\tExiting...\n\n")
         sys.exit(0)
     else:
@@ -222,7 +231,7 @@ def menu(args=None):
             thread.join()
             # redact_document(unzip_folder)
             compile_redacted_project(unzip_folder)
-            # cleanup(unzip_folder)
+            cleanup(unzip_folder)
         except Exception as e:
             print(f"[ERR]\t{e}")
             sys.exit(1)
@@ -232,8 +241,21 @@ def menu(args=None):
     else:
         print("Usage: python main.py <latex project directory>")
         sys.exit(1)
+    
     menu(args)
 
+
+def pdf_to_png(pdf_file):
+    """ Convert pdf to png """
+    # Convert pdf to png
+    images = convert_from_path(pdf_file, 700)
+    if len(images) == 1:
+        # If there is only one page in the pdf
+        images[0].save(pdf_file.replace('.pdf', '.png'))
+    else:
+        for count, image in images:
+            tmp = pdf_file.replace(".pdf", f"{count}.png")
+            image.save(f"{tmp}")
 
 def main():
     """ Main function """
